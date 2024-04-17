@@ -1,5 +1,4 @@
-﻿
-#ifndef __EFFECT_H
+﻿#ifndef __EFFECT_H
 #define __EFFECT_H
 
 #include <entry.h>
