@@ -7,10 +7,10 @@
 #include "util.h"
 
 //----------------------------------------------------------------------------//
-// 概要   :
-// 関数名 :
-// 引数   :
-// 返り値 :
+// Overview:
+// Function Name:
+// Arguments:
+// Return Value:
 //----------------------------------------------------------------------------//
 void PrintAPIErr(APIErr *perr) {
 
@@ -48,7 +48,7 @@ void DebugPrint(char *format, ...) {
 #endif /* _DEBUG */
 
 //----------------------------------------------------------------------------//
-// スピード計測
+// Speed measurement
 
 #if _PROFILE
 #ifdef AE_OS_WIN
@@ -112,7 +112,7 @@ void BeginProfileLap(int index) {
     profile->lapCount = 0;
   }
 
-  QueryPerformanceCounter(&profile->lapStart); // 開始時間
+  QueryPerformanceCounter(&profile->lapStart); // Start time
 }
 
 void EndProfileLap(int index) {
@@ -134,11 +134,11 @@ void EndProfileLap(int index) {
 #endif /* _DEBUG */
 
 //----------------------------------------------------------------------------//
-// 画像処理関連
+// Image Processing Related
 
 //----------------------------------------------------------------------------//
-//概要:     ガンマテーブルの作成
-//引数:     table : テーブルへのポインタ
+// Overview:  Creation of a gamma table
+// Arguments: table : pointer to table
 //----------------------------------------------------------------------------//
 void CreateGanmmaTable(u_char table[256], float Ganmma) {
   int t;
@@ -149,12 +149,12 @@ void CreateGanmmaTable(u_char table[256], float Ganmma) {
 }
 
 //----------------------------------------------------------------------------//
-//名前:     SetDebugPixel()
-//引数:     output : 出力画像
-//			x : x座標
-//			y : y座標
-//返り値:   なし
-//概要:     デバック用に指定した座標に色を置く
+// Name: 			SetDebugPixel()
+// Arguments: 		output : output image
+// x: 				x-coordinate
+// y: 				y-coordinate
+// Return value: 	none
+// Overview: 		Place a color at the specified coordinates for debugging
 //----------------------------------------------------------------------------//
 template <typename PixelType> static inline void getDebugPixel(PixelType *p) {
   p->red = 255;
@@ -186,7 +186,7 @@ void SetDebugPixel(PixelType *out_ptr, PF_LayerDef *output, long target) {
   out_ptr[target] = debug_pixel;
 }
 
-// 明示的インスタンス化
+// Explicit instantiation
 template void SetDebugPixel<PF_Pixel16>(PF_Pixel16 *out_ptr,
                                         PF_LayerDef *output, int x, int y);
 template void SetDebugPixel<PF_Pixel8>(PF_Pixel8 *out_ptr, PF_LayerDef *output,
@@ -198,63 +198,77 @@ template void SetDebugPixel<PF_Pixel8>(PF_Pixel8 *out_ptr, PF_LayerDef *output,
                                        long target);
 
 //----------------------------------------------------------------------------//
-// 概要   :
-// 関数名 :
-// 引数   :
-// 返り値 :
+// Overview   : Blends a line of pixels
+// Function Name : BlendLine
+// Arguments   :
+//    pinfo: Information for blending
+//    length: The length of this pattern
+//    blend_target: The target pixel to blend from (input)
+//    out_target: The target pixel to blend to (output)
+//    ref_offset: The target pixel to refer to for blending (input)
+//    next_pixel_step_in: The value to add when moving to the next pixel (input)
+//    next_pixel_step_out: The value to add when moving to the next pixel
+//    (output) ratio_invert: If true, inverts the blending ratio no_line_weight:
+//    If true, does not consider line weight in blending
+// Return Value : None
 //----------------------------------------------------------------------------//
 template <typename PixelType>
 void BlendLine(
     BlendingInfo<PixelType> *pinfo, //
-    double length,                  // このパターンの長さ
-    long blend_target,              // ブレンド元のターゲット(input)
-    long out_target,                // ブレンド先のターゲット(output)
-    int ref_offset, // ブレンド参照先のターゲット(input)
-    int next_pixel_step_in, // 次のピクセルへ移動するときこの値を足す(input)
-    int next_pixel_step_out, // 次のピクセルへ移動するときこの値を足す(output)
+    double length,                  // The length of this pattern
+    long blend_target,              // The target pixel to blend from (input)
+    long out_target,                // The target pixel to blend to (output)
+    int ref_offset,         // The target pixel to refer to for blending (input)
+    int next_pixel_step_in, // The value to add when moving to the next pixel
+                            // (input)
+    int next_pixel_step_out, // The value to add when moving to the next pixel
+                             // (output)
     bool ratio_invert, bool no_line_weight) {
   double len;
-  int blend_count; // ブレンドするピクセルの数 切り上げ
+  int blend_count; // The number of pixels to blend, rounded up
   double pre_ratio = 0.0;
 
   if (no_line_weight)
-    len = (length * 0.5); // 全体の底辺
+    len = (length * 0.5); // The base of the entire triangle
   else
-    len = (length * (double)pinfo->LineWeight); // 全体の底辺
+    len =
+        (length * (double)pinfo->LineWeight); // The base of the entire triangle
 
   blend_count = CEIL(len);
 
-  // 境界の逆方向からブレンドを行うので、その分移動 //
+  // Since blending is done from the boundary in the opposite direction, move
+  // accordingly //
   blend_target += (blend_count - 1) * next_pixel_step_in;
   out_target += (blend_count - 1) * next_pixel_step_out;
 
-  // 全体の～ : ブレンド全体の三角形、 なし :そのピクセルの三角形
-  // 底辺×高さ÷２ = 底辺×((底辺/全体の底辺)×全体の高さ)÷２
-  //                          ↑相似な三角形なので
-  // = l(底辺) * l(底辺) * 0.5(全体の高さ) * 0.5(÷2) / len(全体の底辺)
+  // The entire ~ : The entire triangle for blending, none : The triangle for
+  // that pixel Base × height ÷ 2 = Base × ((Base / entire base) × entire
+  // height) ÷ 2
+  //                          ↑ Because it's a similar triangle
+  // = l(base) * l(base) * 0.5(entire height) * 0.5(÷2) / len(entire base)
   int t;
   for (t = 0; t < blend_count; t++) {
     double l = len - (float)(((int)CEIL(len) - 1) -
-                             t); // このピクセルでの底辺 CEIL(len)-1 は
-                                 // (1.000...1 ～ 2.0) -> 1.0としたいため
+                             t); // The base at this pixel, CEIL(len)-1 is
+                                 // (1.000...1 ~ 2.0) -> want to make it 1.0
     double ratio = (l * l * 0.5 * 0.5) / len;
     double r;
 
     r = ratio_invert ? 1.0 - (ratio - pre_ratio) : (ratio - pre_ratio);
 
-    // ブレンド
+    // Blend
     Blendingf(pinfo->in_ptr, pinfo->out_ptr, blend_target,
               blend_target + ref_offset, out_target, (float)r);
 
     pre_ratio = ratio;
 
-    // 次のピクセルへ
+    // To the next pixel
     blend_target -= next_pixel_step_in;
     out_target -= next_pixel_step_out;
   }
 }
 
-// 明示的インスタンス化宣言
+// Explicit instantiation declarations
 template void BlendLine<PF_Pixel8>(BlendingInfo<PF_Pixel8> *pinfo,
                                    double length, long blend_target,
                                    long out_target, int ref_offset,
