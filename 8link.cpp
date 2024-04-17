@@ -10,10 +10,12 @@
 //----------------------------------------------------------------------------//
 #define MAX_LENGTH (128)
 
-// The pattern of the 8-link system is to divide vertically into its own area only
+// The pattern of the 8-link system is to divide vertically into its own area
+// only
 // |----|
 //    |----|
-// Each | | takes care of the space in between. Consider inside and outside separately in this case, dividing top and bottom
+// Each | | takes care of the space in between. Consider inside and outside
+// separately in this case, dividing top and bottom
 
 //----------------------------------------------------------------------------//
 // A single column. Is this correct? Not being used?
@@ -81,8 +83,8 @@ void BlendOutside(
     double length,                 // Length of this pattern
     long blend_target,             // Blend target (input)
     long out_target,               // Blend target (output)
-    int ref_offset, // Blend reference target (input)
-    int NextPixelStepIn, // Add this value to move to the next pixel (input)
+    int ref_offset,                // Blend reference target (input)
+    int NextPixelStepIn,  // Add this value to move to the next pixel (input)
     int NextPixelStepOut, // Add this value to move to the next pixel (output)
     bool ratio_invert, bool no_line_weight) {
   double len;      // Base of the whole
@@ -97,7 +99,8 @@ void BlendOutside(
 
   blend_count = CEIL(len);
 
-  // Since blending is done from the opposite direction of the boundary, move accordingly
+  // Since blending is done from the opposite direction of the boundary, move
+  // accordingly
   blend_target += (blend_count - 1) * NextPixelStepIn;
   out_target += (blend_count - 1) * NextPixelStepOut;
 
@@ -134,9 +137,9 @@ template <typename PixelType>
 void BlendInside(
     PixelType TempPixel[2][MAX_LENGTH], int index,
     BlendingInfo<PixelType> *info,
-    double length,     // Length of this pattern
-    long blend_target, // Blend target (input)
-    int ref_offset,    // Blend reference target (input)
+    double length,       // Length of this pattern
+    long blend_target,   // Blend target (input)
+    int ref_offset,      // Blend reference target (input)
     int NextPixelStepIn, // Add this value to move to the next pixel (input)
     bool ratio_invert, bool no_line_weight) {
   double len;      // Base of the whole
@@ -151,7 +154,8 @@ void BlendInside(
 
   blend_count = CEIL(len);
 
-  // Since blending is done from the opposite direction of the boundary, move accordingly
+  // Since blending is done from the opposite direction of the boundary, move
+  // accordingly
   blend_target += (blend_count - 1) * NextPixelStepIn;
 
   int t;
@@ -159,8 +163,9 @@ void BlendInside(
     double l = len - (float)(((int)CEIL(len) - 1) -
                              t); // Base of this pixel, (int)CEIL(len)-1 is
                                  // (1.000...1 ～ 2.0) -> want to make it 1
-    double ratio = (l * l * 1.0 * 0.5) /
-                   len; // Consider height as 1.0 !! This is different (compared to Outside)!!
+    double ratio =
+        (l * l * 1.0 * 0.5) / len; // Consider height as 1.0 !! This is
+                                   // different (compared to Outside)!!
     double r;
 
     r = ratio_invert ? 1.0 - (ratio - pre_ratio) : (ratio - pre_ratio);
@@ -242,7 +247,8 @@ Link8Execute(BlendingInfo<PixelType> *info,
     // Outside
     //------------------------------------------------------------------------//
 
-    // Don't process if the target to be blended is also a closed position (outside only)
+    // Don't process if the target to be blended is also a closed position
+    // (outside only)
     if (AreaMin < AreaPosition && AreaPosition < AreaMax) {
       if (ComparePixelEqual(in_target - RefPixelStepIn,
                             in_target - RefPixelStepIn * 2)) {
@@ -276,7 +282,8 @@ Link8Execute(BlendingInfo<PixelType> *info,
     // Outside
     //------------------------------------------------------------------------//
 
-    // Don't process if the target to be blended is also a closed position (outside only)
+    // Don't process if the target to be blended is also a closed position
+    // (outside only)
     if (AreaMin < AreaPosition && AreaPosition < AreaMax) {
       if (ComparePixelEqual(in_target + RefPixelStepIn,
                             in_target + RefPixelStepIn * 2)) {
@@ -301,7 +308,8 @@ Link8Execute(BlendingInfo<PixelType> *info,
   }
 
   //----------------------------------------------------------------------------
-  // Processing for cases where both sides are inside and their colors are different
+  // Processing for cases where both sides are inside and their colors are
+  // different
   //   Γ
   //__Γ____ Pattern where three colors intersect
   //
@@ -345,8 +353,9 @@ Link8Execute(BlendingInfo<PixelType> *info,
     }
 
     if (blend_flg) {
-      // Blend with the color considered to be the same as the color above (or to the right) of the protrusion
-      // Blending with just one pixel can introduce noise
+      // Blend with the color considered to be the same as the color above (or
+      // to the right) of the protrusion Blending with just one pixel can
+      // introduce noise
       double len = (double)MIN(Length[0], Length[1]);
 
       if (ComparePixelEqual(info->in_target - NextPixelStepIn,
@@ -378,7 +387,7 @@ Link8Execute(BlendingInfo<PixelType> *info,
       // Both sides exist
       if ((i < len[0] && inside_flg[0] == true) &&
           (i < len[1] && inside_flg[1] == true)) {
-            // Average the colors of corresponding pixels from both sides
+        // Average the colors of corresponding pixels from both sides
         out_ptr[out_target + i * NextPixelStepOut].red =
             (TempPixel[0][i].red + TempPixel[1][i].red) / 2;
         out_ptr[out_target + i * NextPixelStepOut].green =
@@ -388,12 +397,14 @@ Link8Execute(BlendingInfo<PixelType> *info,
         out_ptr[out_target + i * NextPixelStepOut].alpha =
             (TempPixel[0][i].alpha + TempPixel[1][i].alpha) / 2;
       } else if (i < len[0] && inside_flg[0] == true) { // Only side 0 exists
-      // Blend the pixel from side 0 with the output using a blending factor of 0.5
+        // Blend the pixel from side 0 with the output using a blending factor
+        // of 0.5
         BlendingPixelf(&in_ptr[in_target + i * NextPixelStepIn],
                        &TempPixel[0][i],
                        &out_ptr[out_target + i * NextPixelStepOut], 0.5f);
       } else if (i < len[1] && inside_flg[1] == true) { // Only side 1 exists
-      // Blend the pixel from side 1 with the output using a blending factor of 0.5
+        // Blend the pixel from side 1 with the output using a blending factor
+        // of 0.5
         BlendingPixelf(&in_ptr[in_target + i * NextPixelStepIn],
                        &TempPixel[1][i],
                        &out_ptr[out_target + i * NextPixelStepOut], 0.5f);
@@ -474,7 +485,8 @@ Link8Execute(BlendingInfo<PixelType> *info,
 //----------------------------------------------------------------------------//
 // Main function for Mode 2
 // Since it's possible that two inference lines are affecting a single pixel,
-// the image is divided vertically into two parts, and the pixel values of each part are averaged to get the result.
+// the image is divided vertically into two parts, and the pixel values of each
+// part are averaged to get the result.
 //----------------------------------------------------------------------------//
 template <typename PixelType>
 void Link8Mode02Execute(BlendingInfo<PixelType> *info) {
