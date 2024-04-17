@@ -63,7 +63,7 @@ void downMode_LeftCountLength(BlendingInfo<PixelType> *info) {
         if (!(info->flag & SECOND_COUNT) &&
             ComparePixel(count_target - 1,
                          count_target - 1 +
-                             width)) // 角かどうか調べる // **********
+                             width)) // Check whether it's a corner **********
         {
           // Count there
           BlendingInfo<PixelType> sc_info;
@@ -595,7 +595,8 @@ void downMode_TopBlending(BlendingInfo<PixelType> *info) {
     blend_target =
         info->in_target -
         (blend_count - 1) *
-            in_width; // info->targetが最終処理ピクセルなので-1 // ******:
+            in_width; // since info->target is the last processing pixel,
+                      // subtract 1 ******:
     out_target = info->out_target - (blend_count - 1) * out_width;
 
     // Calculated from the bottom
