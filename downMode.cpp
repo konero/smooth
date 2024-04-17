@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------------//
-// 概要: アンチの下系の処理
+// Processing Lower Angles
 //----------------------------------------------------------------------------//
 
 #include "util.h"
@@ -11,13 +11,13 @@
 #include <math.h>
 
 //----------------------------------------------------------------------------//
-// 名前:        downMode_????CountLength
-// 概要:        アンチを掛ける長さをカウント
-// 引数:        info : カウント情報の構造体
-// 返り値:      なし
+// Name:        downMode_????CountLength
+// Description: Counts the length to apply antialiasing.
+// Arguments:   info: Structure containing count information.
+// Returns:     None
 //----------------------------------------------------------------------------//
 
-// Left
+// Left side count for antialiasing length
 template <typename PixelType>
 void downMode_LeftCountLength(BlendingInfo<PixelType> *info)
 {
@@ -31,40 +31,40 @@ void downMode_LeftCountLength(BlendingInfo<PixelType> *info)
 
     while (1)
     {
-        count_target = info->in_target - (len - 1); // 検査するターゲットを変更
+        count_target = info->in_target - (len - 1); // Change the target for examination
 
-        // べた塗り系か？
+        // Check if it's a solid fill
         if (ComparePixel(count_target, count_target - 1))
-        { // 下側走査
+        { // Scan from the bottom
 
-            info->core[0].start = (float)(info->i + 1); // 画像の座標は左上が(0,0), でも論理線は右からだから+1
+            info->core[0].start = (float)(info->i + 1); // Image coordinates start from top-left (0,0), but logical lines start from right
             info->core[0].end = (float)(info->i + 1) - (float)len;
 
-            // 特殊処理するよフラグなりなんなり立てる
+            // Set a flag or perform special processing if needed
             (*flg) |= CR_FLG_FILL;
 
             break;
         }
 
-        count_target = info->in_target + width - (len - 1); // 検査するターゲットを変更 ******
+        count_target = info->in_target + width - (len - 1); // Change the target for examination ******
 
         if (ComparePixel(count_target, count_target - 1))
-        { // 上側走査
-            info->core[0].start = (float)(info->i + 1); // 画像の座標は左上が(0,0), でも論理線は右からだから+1
+        { // Scan from the top
+            info->core[0].start = (float)(info->i + 1); // Image coordinates start from top-left (0,0), but logical lines start from right
             info->core[0].end = (float)(info->i + 1) - (float)len;
 
             if (width - 2 > info->i && info->i > 2 &&
                 height - 2 > info->j && info->j > 2)
             {
-                // end値修正が必要か？
-                // 線上の1つ上の角のレングスを調べ、その差が１だったら補正
+                // Check if end value correction is needed
+                // Examine the length of the corner above the line, and if the difference is 1, make a correction
                 if (!(info->flag & SECOND_COUNT) &&
                     ComparePixel(count_target - 1, count_target - 1 + width)) // 角かどうか調べる // **********
                 {
-                    // そこでカウント
+                    // Count there
                     BlendingInfo<PixelType> sc_info;
 
-                    sc_info = *info; // コピーして初期化
+                    sc_info = *info; // Copy and initialize
 
                     sc_info.i = info->i - len;
                     sc_info.j = info->j + 1; // **************
@@ -76,7 +76,7 @@ void downMode_LeftCountLength(BlendingInfo<PixelType> *info)
 
                     if (sc_info.core[0].length - len == 1)
                     {
-                        info->core[0].end -= 0.5f; // 半ピクセル左にあるものと補正
+                        info->core[0].end -= 0.5f; // Correct for something half a pixel to the left
                     }
                 }
             }
@@ -86,12 +86,12 @@ void downMode_LeftCountLength(BlendingInfo<PixelType> *info)
 
         len++;
 
-        // x = 0の点まで行ったら終り
+        // End if it reaches x = 0
         if (info->i - len <= 1)
         {
             len = info->i - 1;
 
-            info->core[0].start = (float)(info->i + 1); // 画像の座標は左上が(0,0), でも論理線は右からだから+1
+            info->core[0].start = (float)(info->i + 1); // Image coordinates start from top-left (0,0), but logical lines start from right
             info->core[0].end = (float)(info->i + 1) - (float)len;
             break;
         }
@@ -102,7 +102,7 @@ void downMode_LeftCountLength(BlendingInfo<PixelType> *info)
 
 //----------------------------------------------------------------------------//
 
-// Right
+// Right side count for antialiasing length
 template <typename PixelType>
 void downMode_RightCountLength(BlendingInfo<PixelType> *info)
 {
@@ -114,8 +114,8 @@ void downMode_RightCountLength(BlendingInfo<PixelType> *info)
         height = output->height;
     u_int *flg = &info->core[1].flg;
 
-    // 始めの1回は左の方だけ検査
-    count_target = info->in_target - width; // 検査するターゲットを変更 ******
+    // First check only the left side
+    count_target = info->in_target - width; // Change the target for examination ******
     if (ComparePixel(count_target, count_target + 1) &&
         ComparePixelEqual(count_target + 1, count_target + 1 + width))
     {
@@ -130,7 +130,7 @@ void downMode_RightCountLength(BlendingInfo<PixelType> *info)
         {
             len = width - 1 - (info->i + 1);
 
-            info->core[1].start = (float)(info->i + 1); // 画像の座標は左上が(0,0), でも論理線は右からだから+1
+            info->core[1].start = (float)(info->i + 1); // Image coordinates start from top-left (0,0), but logical lines start from right
             info->core[1].end = (float)(info->i + 1) + (float)len;
             info->core[1].length = len;
             return;
@@ -139,40 +139,40 @@ void downMode_RightCountLength(BlendingInfo<PixelType> *info)
 
     while (1)
     {
-        count_target = info->in_target + len; // 検査するターゲットを変更
+        count_target = info->in_target + len; // Change the target for examination
 
-        // べた塗り系か？
+        // Check if it's a solid fill
         if (ComparePixel(count_target, count_target + 1))
         {
-            info->core[1].start = (float)(info->i + 1); // 画像の座標は左上が(0,0), でも論理線は右からだから+1
+            info->core[1].start = (float)(info->i + 1); // Image coordinates start from top-left (0,0), but logical lines start from right
             info->core[1].end = (float)(info->i + 1 + len);
 
-            // 特殊処理するよフラグなりなんなり立てる
+            // Set a flag or perform special processing if needed
             (*flg) |= CR_FLG_FILL;
 
             break;
         }
 
-        count_target = info->in_target - width + len; // 検査するターゲットを変更 *********
+        count_target = info->in_target - width + len; // Change the target for examination *********
 
         if (ComparePixel(count_target, count_target + 1))
         {
-            info->core[1].start = (float)(info->i + 1); // 画像の座標は左上が(0,0), でも論理線は右からだから+1
+            info->core[1].start = (float)(info->i + 1); // Image coordinates start from top-left (0,0), but logical lines start from right
             info->core[1].end = (float)(info->i + 1 + len);
 
             if (width - 2 > info->i && info->i > 2 &&
                 height - 2 > info->j && info->j > 2)
             {
-                // end値修正が必要か？
-                // 線上の1つ下の角のレングスを調べ、その差が１だったら補正
-                // 角かどうか調べる
+                // Check if end value correction is needed
+                // Examine the length of the corner below the line, and if the difference is 1, make a correction
+                // Check if it's a corner
                 if (!(info->flag & SECOND_COUNT) &&
                     ComparePixel(count_target, count_target + 1))
                 {
-                    // そこでカウント //
+                    // Count there
                     BlendingInfo<PixelType> sc_info;
 
-                    sc_info = *info; // コピーして初期化
+                    sc_info = *info; // Copy and initialize
 
                     sc_info.i = info->i + len;
                     sc_info.j = info->j - 1; // *********
@@ -184,7 +184,7 @@ void downMode_RightCountLength(BlendingInfo<PixelType> *info)
 
                     if (len - sc_info.core[1].length == 1 && sc_info.core[1].length != 0)
                     {
-                        info->core[1].end -= 0.5f; // 半ピクセル右にあるものと補正
+                        info->core[1].end -= 0.5f; // Correct for something half a pixel to the right
                     }
                 }
             }
@@ -194,12 +194,12 @@ void downMode_RightCountLength(BlendingInfo<PixelType> *info)
 
         len++;
 
-        // x = 0の点まで行ったら終り //
+        // End if it reaches x = 0
         if ((info->i + 1) + len >= (width - 1))
         {
             len = width - 1 - (info->i + 1);
 
-            info->core[1].start = (float)(info->i + 1); // 画像の座標は左上が(0,0), でも論理線は右からだから+1
+            info->core[1].start = (float)(info->i + 1); // Image coordinates start from top-left (0,0), but logical lines start from right
             info->core[1].end = (float)(info->i + 1) + (float)len;
             break;
         }
@@ -210,7 +210,7 @@ void downMode_RightCountLength(BlendingInfo<PixelType> *info)
 
 //----------------------------------------------------------------------------//
 
-// Top
+// Top side count for antialiasing length
 template <typename PixelType>
 void downMode_TopCountLength(BlendingInfo<PixelType> *info)
 {
@@ -224,15 +224,15 @@ void downMode_TopCountLength(BlendingInfo<PixelType> *info)
 
     while (1)
     {
-        count_target = info->in_target - (len - 1) * width; // 検査するターゲットを変更 ****
+        count_target = info->in_target - (len - 1) * width; // Change the target for examination ****
 
-        // べた塗り系か？
+        // Check if it's a solid fill
         if (ComparePixel(count_target, count_target - width)) // *******
         {
             info->core[2].start = (float)(info->j);
             info->core[2].end = (float)(info->j - len); // ******
 
-            // べた塗りです //
+            // It's a solid fill //
             // DEBUG_PIXEL( info->in_target, DEBUG_COL_BLUE);
 
             (*flg) |= CR_FLG_FILL;
@@ -240,7 +240,7 @@ void downMode_TopCountLength(BlendingInfo<PixelType> *info)
             break;
         }
 
-        count_target = info->in_target - (len - 1) * width + 1; // 検査するターゲットを変更 ***
+        count_target = info->in_target - (len - 1) * width + 1; // Change the target for examination ***
 
         if (ComparePixel(count_target, count_target - width)) // *******
         {
@@ -250,16 +250,16 @@ void downMode_TopCountLength(BlendingInfo<PixelType> *info)
             if (width - 2 > info->i && info->i > 2 &&
                 height - 2 > info->j && info->j > 2)
             {
-                // end値修正が必要か？
-                // 線上の1つ下の角のレングスを調べ、その差が１だったら補正
-                // 角かどうか調べる
+                // Check if end value correction is needed
+                // Examine the length of the corner below the line, and if the difference is 1, make a correction
+                // Check if it's a corner
                 if (!(info->flag & SECOND_COUNT) &&
                     ComparePixel(count_target - width, count_target - width + 1)) // *******
                 {
-                    // そこでカウント //
+                    // Count there //
                     BlendingInfo<PixelType> sc_info;
 
-                    sc_info = *info; // コピーして初期化
+                    sc_info = *info; // Copy and initialize
 
                     sc_info.i = info->i + 1;
                     sc_info.j = info->j - len; // *******
@@ -271,7 +271,7 @@ void downMode_TopCountLength(BlendingInfo<PixelType> *info)
 
                     if (len - sc_info.core[2].length == 1)
                     {
-                        info->core[2].end += 0.5f; // 半ピクセル右にあるものと補正
+                        info->core[2].end += 0.5f; // Correct for something half a pixel to the right
                     }
                 }
             }
@@ -281,7 +281,7 @@ void downMode_TopCountLength(BlendingInfo<PixelType> *info)
 
         len++;
 
-        // y = 0の点(画像の一番上)まで行ったら終了 // *****
+        // End if it reaches y = 0 (the top of the image) // *****
         if ((info->j + 1) - len <= 1)
         {
             len = info->j + 1 - 1;
@@ -298,7 +298,7 @@ void downMode_TopCountLength(BlendingInfo<PixelType> *info)
 
 //----------------------------------------------------------------------------//
 
-// Bottom
+// Bottom side count for antialiasing length
 template <typename PixelType>
 void downMode_BottomCountLength(BlendingInfo<PixelType> *info)
 {
@@ -311,10 +311,10 @@ void downMode_BottomCountLength(BlendingInfo<PixelType> *info)
     u_int *flg = &info->core[3].flg;
 
     //----------------------------------------------------------//
-    //              上側(top_len)の長さカウント             //
+    //              Counting length for the top side (top_len)             //
     //----------------------------------------------------------//
-    // 始めの1回は左の方だけ検査 //
-    count_target = info->in_target - 1; // 検査するターゲットを変更
+    // Initially, only examine towards the left side //
+    count_target = info->in_target - 1; // Change the target for examination
 
     if (ComparePixel(count_target, count_target + width) &&
         ComparePixelEqual(count_target + width, count_target + 1 + width))
@@ -339,16 +339,16 @@ void downMode_BottomCountLength(BlendingInfo<PixelType> *info)
 
     while (1)
     {
-        count_target = info->in_target + (len * width); // 検査するターゲットを変更 *****
+        count_target = info->in_target + (len * width); // Change the target for examination *****
 
-        // べた塗り系か？
+        // Is it a solid color area?
         //--------------------------------------------------------------------//
         if (ComparePixel(count_target, count_target + width)) // ******
         {
             info->core[3].start = (float)(info->j);
             info->core[3].end = (float)(info->j + len); // *******
 
-            // べた塗りです //
+            // It's a solid color area //
             // DEBUG_PIXEL( info->in_target, DEBUG_COL_BLUE);
 
             (*flg) |= CR_FLG_FILL;
@@ -356,9 +356,9 @@ void downMode_BottomCountLength(BlendingInfo<PixelType> *info)
             break;
         }
 
-        count_target = info->in_target + (len * width) - 1; // 検査するターゲットを変更 ****
+        count_target = info->in_target + (len * width) - 1; // Change the target for examination ****
 
-        // 1ピクセルずつ調べていって違う色になった？
+        // Check pixel by pixel, does it change color?
         //--------------------------------------------------------------------//
         if (ComparePixel(count_target, count_target + width)) // *********
         {
@@ -368,16 +368,16 @@ void downMode_BottomCountLength(BlendingInfo<PixelType> *info)
             if (width - 2 > info->i && info->i > 2 &&
                 height - 2 > info->j && info->j > 2)
             {
-                //// end値修正が必要か？ ////
-                //// 線上の1つ下の角のレングスを調べ、その差が１だったら補正 ////
-                // 角かどうか調べる //
+                // Does the end value need correction?
+                // Check the length of the angle one pixel below the line, if the difference is one, correct it
+                // Check if it's an angle 
                 if (!(info->flag & SECOND_COUNT) &&
                     ComparePixel(count_target, count_target + 1))
                 {
-                    // そこでカウント //
+                    // Count here //
                     BlendingInfo<PixelType> sc_info;
 
-                    sc_info = *info; // コピーして初期化
+                    sc_info = *info; // Copy and initialize
 
                     sc_info.i = info->i - 1;
                     sc_info.j = info->j + len; // *******
@@ -387,17 +387,10 @@ void downMode_BottomCountLength(BlendingInfo<PixelType> *info)
 
                     downMode_BottomCountLength(&sc_info);
 
-                    // fprintf(debug_fp, "bot  : %d\n", sc_info.core[2].length);
-                    // fprintf(debug_fp, "len  : %d\n", len);
-
                     if (sc_info.core[3].length - len == 1)
                     {
-                        info->core[3].end += 0.5f; // 半ピクセル右にあるものと補正 //
-
-                        // fprintf(debug_fp, "<%d, %d>\n", info->i, info->j);
+                        info->core[3].end += 0.5f; // Correct for half a pixel to the right
                     }
-
-                    // fprintf(debug_fp, "---------------\n");
                 }
             }
 
@@ -406,7 +399,7 @@ void downMode_BottomCountLength(BlendingInfo<PixelType> *info)
 
         len++;
 
-        // 最後まで行ったら終り // ****
+        // Finish if we've reached the end ****
         if ((info->j + 1) + len >= height - 1)
         {
             len = height - 1 - (info->j + 1);
@@ -417,15 +410,15 @@ void downMode_BottomCountLength(BlendingInfo<PixelType> *info)
         }
     }
 
-    // コピー //
+    // Copy
     info->core[3].length = len;
 }
 
 //----------------------------------------------------------------------------//
-// 名前:     downMode_????Blending()
-// 概要:     実際にアンチをかける
-// 引数:     info : カウント情報の構造体
-// 返り値:   なし
+// Name:        downMode_????Blending()
+// Description: Performs anti-aliasing blending
+// Arguments:   info: Blending information structure
+// Returns:     None
 //----------------------------------------------------------------------------//
 
 //----------------------------------------------------------------------------//
@@ -439,13 +432,13 @@ void downMode_LeftBlending(BlendingInfo<PixelType> *info)
     float end = info->core[0].end;
     int in_width = GET_WIDTH(info->input);
 
-    // 通常Length の値は半分にしてつかうけど今回は単位が1/2ピクセル単位なので2倍、len*(1/2)*2=len
-    // でそのまま使える
+    // Normally, the Length value is halved for use, but in this case, the unit is 1/2 pixel, so it's doubled.
+    // len*(1/2)*2 = len, so it can be used directly
 #if 0
     if(flg & CR_FLG_FILL)
     {
         //----------------------//
-        //      べた塗り        //
+        //      Fill Mode       //
         //----------------------//
         int t;
 
@@ -461,38 +454,38 @@ void downMode_LeftBlending(BlendingInfo<PixelType> *info)
 #endif
     {
         //--------------//
-        //      通常    //
+        //     Normal    //
         //--------------//
         long blend_target = 0, out_target = 0;
         int blend_count;
-        float pre_ratio, // 一つ前の三角の面積比
-            ratio,       // 現行の面積比
-            l,           // 底辺の長さ
-            len;         // 全体の底辺の長さ
-        int end_p;       // 開始ピクセル(名前がendなのはinfo->end系だから)
+        float pre_ratio, // Previous triangle area ratio
+            ratio,       // Current area ratio
+            l,           // Base length
+            len;         // Total base length
+        int end_p;       // Starting pixel (named end because it's related to info->end)
 
         end_p = (int)end;
 
         len = start - end;
 
-        // 何ピクセルブレンドするのか？切り上げ //
+        // Number of pixels to blend, rounded up
         blend_count = CEIL((float)(info->i + 1) - end);
 
-        // 前回の割合 初期化 //
+        // Initialize previous ratio
         pre_ratio = 0.0f;
 
-        // ブレンドするターゲットの初期化 //
+        // Initialize blend target
         blend_target = info->in_target - (blend_count - 1);
         out_target = info->out_target - (blend_count - 1);
 
-        // 底辺×高さ÷２ = 底辺×((底辺/全体の底辺)×全体の高さ)÷２ = l * l * 0.5 * 0.5 / len //
-        // 左から計算してく //
+        // Base × height ÷ 2 = Base × ((Base / Total Base) × Total Height) ÷ 2 = l * l * 0.5 * 0.5 / len
+        // Calculated from the left
         for (t = 0; t < blend_count; t++)
         {
             l = (float)(end_p + 1 + t) - end;
             ratio = (l * l * 0.5f * 0.5f) / len;
 
-            // ブレンド //
+            // Blend
             Blendingf(info->in_ptr,
                       info->out_ptr,
                       blend_target,
@@ -523,46 +516,46 @@ void downMode_RightBlending(BlendingInfo<PixelType> *info)
     else if(flg & CR_FLG_FILL)
     {
         //----------------------//
-        //      べた塗り        //
+        //      Fill Mode       //
         //----------------------//
     }
 #endif
     {
         //--------------//
-        //      通常    //
+        //     Normal     //
         //--------------//
         if (length > 0)
         {
             long blend_target = 0, out_target = 0;
             int blend_count;
-            float pre_ratio, // 一つ前の三角の面積比
-                ratio,       // 現行の面積比
-                l,           // 底辺の長さ
-                len;         // 全体の底辺の長さ
-            int end_p;       // 開始ピクセル(名前がendなのはinfo->end系だから)
+            float pre_ratio, // Previous triangle area ratio
+                ratio,       // Current area ratio
+                l,           // Base length
+                len;         // Total base length
+            int end_p;       // Starting pixel (named end because it's related to info->end)
 
-            // そもそのend_pは必要？ ratio の計算は結局座標値は関係ないので、いらないんじゃない？ 8link参照
-            end_p = (int)(end - 0.000001); // 4.0fなどの丁度のところでおかしくなるのの苦肉の策
+            // This end_p is needed? The calculation of the ratio doesn't depend on coordinate values, so it might not be necessary? Referring to link 8
+            end_p = (int)(end - 0.000001); // A workaround for exact values like 4.0f causing issues
 
             len = end - start;
 
-            // 何ピクセルブレンドするのか？切り上げ //
+            // Number of pixels to blend, rounded up
             blend_count = CEIL(end - (float)(info->i + 1));
 
-            // 前回の割合 初期化 //
+            // Initialize previous ratio
             pre_ratio = 0.0f;
 
-            // ブレンドするターゲットの初期化 //
+            // Initialize blend target
             blend_target = info->in_target + blend_count;
             out_target = info->out_target + blend_count;
 
-            // 右から計算してく //
+            // Calculated from the right
             for (t = 0; t < blend_count; t++)
             {
                 l = end - (float)(end_p - t);
                 ratio = (l * l * 0.5f * 0.5f) / len;
 
-                // ブレンド //
+                // Blend
                 Blendingf(info->in_ptr,
                           info->out_ptr,
                           blend_target,
@@ -595,51 +588,51 @@ void downMode_TopBlending(BlendingInfo<PixelType> *info)
     else if(flg & CR_FLG_FILL)
     {
         //----------------------//
-        //      べた塗り        //
+        //      Fill Mode       //
         //----------------------//
     }
 #endif
-    { // 通常
+    { // Normal
         long blend_target = 0, out_target = 0;
         int blend_count;
-        float pre_ratio, // 一つ前の三角の面積比
-            ratio,       // 現行の面積比
-            l,           // 底辺の長さ
-            len;         // 全体の底辺の長さ
-        int end_p;       // 開始ピクセル(名前がendなのはinfo->end系だから)
+        float pre_ratio, // Previous triangle area ratio
+            ratio,       // Current area ratio
+            l,           // Base length
+            len;         // Total base length
+        int end_p;       // Starting pixel (named end because it's related to info->end)
 
         end_p = (int)end;
 
-        len = start - end; // *****
+        len = start - end; // Calculate the total base length *****
 
-        // 何ピクセルブレンドするのか？切り上げ //
+        // Number of pixels to blend, rounded up
         blend_count = CEIL((float)(info->j) - end); // ****
 
-        // 前回の割合 初期化 //
+        // Initialize previous ratio
         pre_ratio = 0.0f;
 
-        // ブレンドするターゲットの初期化 //
+        // Initialize blend target
         blend_target = info->in_target - (blend_count - 1) * in_width; // info->targetが最終処理ピクセルなので-1 // ******:
         out_target = info->out_target - (blend_count - 1) * out_width;
 
-        // 下から計算してく //
+        // Calculated from the bottom
         for (t = 0; t < blend_count; t++)
         {
-            l = (float)(end_p + 1 + t) - end; // ****
-            ratio = (l * l * 0.5f * 0.5f) / len;
+            l = (float)(end_p + 1 + t) - end; // Calculate the base length for each pixel blend // ****
+            ratio = (l * l * 0.5f * 0.5f) / len; // Calculate the area ratio for each pixel blend
 
-            // ブレンド //
+            // Blend
             Blendingf(info->in_ptr,
                       info->out_ptr,
                       blend_target,
                       blend_target + 1,
                       out_target,
-                      1.0f - (ratio - pre_ratio));
+                      1.0f - (ratio - pre_ratio)); // Blend based on the area ratio
 
             pre_ratio = ratio;
 
-            blend_target += in_width; // ******
-            out_target += out_width;  // ******
+            blend_target += in_width; // Move to the next pixel in the input buffer // ******
+            out_target += out_width; // Move to the next pixel in the output buffer // ******
         }
     }
 }
@@ -657,49 +650,48 @@ void downMode_BottomBlending(BlendingInfo<PixelType> *info)
     int in_width = GET_WIDTH(info->input);
     int out_width = GET_WIDTH(info->output);
 
-    // 通常Length の値は半分にしてつかうけど今回は単位が半ピクセル単位なので2倍、len*(1/2)*2=len
-    // でそのまま使える
+    // Normally, the Length value is halved, but in this case, since the unit is half-pixel units, it's doubled, len*(1/2)*2=len, so we can use it as is.
 
 #if 0
     else if(flg->top & CR_FLG_FILL)
     {
         //----------------------//
-        //      べた塗り        //
+        //      Fill Mode       //
         //----------------------//
     }
 #endif
-    { // 通常
+    { // Normal
         if (length > 0)
         {
             long blend_target = 0, out_target = 0;
             int blend_count;
-            float pre_ratio, // 一つ前の三角の面積比
-                ratio,       // 現行の面積比
-                l,           // 底辺の長さ
-                len;         // 全体の底辺の長さ
-            int end_p;       // 開始ピクセル(名前がendなのはinfo->end系だから)
+            float pre_ratio, // Previous triangle area ratio
+                ratio,       // Current area ratio
+                l,           // Base length
+                len;         // Total base length
+            int end_p;       // Starting pixel (named end because it's related to info->end)
 
-            end_p = (int)(end - 0.00001); // 4.0fなどの丁度のところでおかしくなるのの苦肉の策
+            end_p = (int)(end - 0.00001); // A workaround for cases like 4.0f where it becomes incorrect
 
-            len = end - start; // ***:
+            len = end - start; // Calculate the total base length ***:
 
-            // 何ピクセルブレンドするのか？切り上げ //
+            // Number of pixels to blend, rounded up
             blend_count = CEIL(end - (float)(info->j)); // *****:
 
-            // 前回の割合 初期化 //
+            // Initialize previous ratio
             pre_ratio = 0.0f;
 
-            // ブレンドするターゲットの初期化 //
+            // Initialize blend target
             blend_target = info->in_target + blend_count * in_width; // *******
             out_target = info->out_target + blend_count * out_width;
 
-            // 上から計算してく //
+            // Calculated from the top
             for (t = 0; t < blend_count; t++)
             {
-                l = end - (float)(end_p - t); // *****
-                ratio = (l * l * 0.5f * 0.5f) / len;
+                l = end - (float)(end_p - t); // Calculate the base length for each pixel blend // *****
+                ratio = (l * l * 0.5f * 0.5f) / len; // Calculate the area ratio for each pixel blend
 
-                // ブレンド //
+                // Blend
                 Blendingf(info->in_ptr,
                           info->out_ptr,
                           blend_target,
@@ -716,7 +708,7 @@ void downMode_BottomBlending(BlendingInfo<PixelType> *info)
     }
 }
 
-// 明示的インスタンス化宣言
+// Explicit instantiation declarations
 template void downMode_LeftCountLength<PF_Pixel8>(BlendingInfo<PF_Pixel8> *info);
 template void downMode_LeftCountLength<PF_Pixel16>(BlendingInfo<PF_Pixel16> *info);
 
