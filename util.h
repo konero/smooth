@@ -4,11 +4,12 @@
 #include <math.h>
 #include <string>
 
-#include "AEConfig.h"
 #include "A.h"
+#include "AEConfig.h"
 #include "AE_Effect.h"
 #include "AE_Macros.h"
 #include "version.h"
+
 
 #include "define.h"
 
@@ -136,8 +137,7 @@ template <> inline unsigned int getMaxValue<PF_Pixel8>() { return 0xff; }
 #define ABS(a) ((a) < 0 ? -(a) : (a))
 #endif
 
-#define GET_SIGN(a)                                                            \
-  ((a) / ABS((a))) // Get sign -1 if negative, +1 if positive
+#define GET_SIGN(a) ((a) / ABS((a))) // Get sign -1 if negative, +1 if positive
 
 //----------------------------------------------------------------------------//
 // Functions
@@ -314,15 +314,16 @@ void SetDebugPixel(PixelType *out_ptr, PF_LayerDef *output, long target);
 #endif
 
 template <typename PixelType>
-void BlendLine(
-    BlendingInfo<PixelType> *pinfo, //
-    double length,                  // Length of this pattern
-    long blend_target,              // Target of blend source (input)
-    long out_target,                // Target for blending destination (output)
-    int ref_offset, // Target of blend reference (input)
-    int next_pixel_step_in, // Add this value when moving to the next pixel (input)
-    int next_pixel_step_out, // Add this value when moving to the next pixel (output)
-    bool ratio_invert, bool no_line_weight);
+void BlendLine(BlendingInfo<PixelType> *pinfo, //
+               double length,                  // Length of this pattern
+               long blend_target,              // Target of blend source (input)
+               long out_target, // Target for blending destination (output)
+               int ref_offset,  // Target of blend reference (input)
+               int next_pixel_step_in, // Add this value when moving to the next
+                                       // pixel (input)
+               int next_pixel_step_out, // Add this value when moving to the
+                                        // next pixel (output)
+               bool ratio_invert, bool no_line_weight);
 
 //----------------------------------------------------------------------------//
 // Util

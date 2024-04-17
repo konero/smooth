@@ -54,7 +54,7 @@ static PF_Err PopDialog(PF_InData *in_data, PF_OutData *out_data,
 //----------------------------------------------------------------------------//
 /**
  * @brief Retrieves a white pixel color in PF_Pixel16 format.
- * 
+ *
  * @param white Pointer to PF_Pixel16 to store the white pixel color.
  */
 static inline void getWhitePixel(PF_Pixel16 *white) {
@@ -64,7 +64,7 @@ static inline void getWhitePixel(PF_Pixel16 *white) {
 
 /**
  * @brief Retrieves a white pixel color in PF_Pixel8 format.
- * 
+ *
  * @param white Pointer to PF_Pixel8 to store the white pixel color.
  */
 static inline void getWhitePixel(PF_Pixel8 *white) {
@@ -74,7 +74,7 @@ static inline void getWhitePixel(PF_Pixel8 *white) {
 
 /**
  * @brief Retrieves a null (black) pixel color in PF_Pixel16 format.
- * 
+ *
  * @param null_pixel Pointer to PF_Pixel16 to store the null pixel color.
  */
 static inline void getNullPixel(PF_Pixel16 *null_pixel) {
@@ -84,7 +84,7 @@ static inline void getNullPixel(PF_Pixel16 *null_pixel) {
 
 /**
  * @brief Retrieves a null (black) pixel color in PF_Pixel8 format.
- * 
+ *
  * @param null_pixel Pointer to PF_Pixel8 to store the null pixel color.
  */
 static inline void getNullPixel(PF_Pixel8 *null_pixel) {
