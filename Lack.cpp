@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------------//
-// コメント     : 2pixel以上の欠けているような状態の角の処理
+// Processing of corners that appear to be missing more than 2 pixels
 //----------------------------------------------------------------------------//
 
 #include "define.h"
@@ -8,7 +8,7 @@
 #include "Lack.h"
 
 //----------------------------------------------------------------------------//
-// モード 1
+// Mode 1
 //   |
 // __| 1
 //----------------------------------------------------------------------------//
@@ -25,7 +25,7 @@ void LackMode01Execute(BlendingInfo<PixelType> *info) {
   v = info->core[2].length; // top
   range = info->range;
 
-  // モード01に該当するか調べる
+  // Check to see if mode 01 is applicable
   if (ComparePixel(info->in_target, info->in_target - width - 1)) {
     return;
   }
@@ -54,14 +54,14 @@ void LackMode01Execute(BlendingInfo<PixelType> *info) {
 }
 
 //----------------------------------------------------------------------------//
-// モード 2
+// Mode 2
 // __
 //   |
 //   | 2
 //----------------------------------------------------------------------------//
 template <typename PixelType>
 void LackMode02Execute(BlendingInfo<PixelType> *info) {
-  // モード02に該当するか調べる
+  // Check to see if mode 02 is applicable
   long h, v, width;
   long range;
 
@@ -73,12 +73,12 @@ void LackMode02Execute(BlendingInfo<PixelType> *info) {
   v = info->core[3].length; // bottom
   range = info->range;
 
-  // モード01に該当するか調べる
+  // Check to see if mode 01 is applicable
   if (ComparePixel(info->in_target, info->in_target + width - 1)) {
     return;
   }
 
-  // ブレンド
+  // Blend
   if ((3 >= h && h >= 2) && (3 >= v && v >= 2)) {
     PixelType ref0, ref1, ref2, ref_temp, src;
 
@@ -102,7 +102,7 @@ void LackMode02Execute(BlendingInfo<PixelType> *info) {
 }
 
 //----------------------------------------------------------------------------//
-// モード 3,4
+// Mode 3,4
 //
 // |
 // |__ 3
@@ -126,15 +126,15 @@ void LackMode0304Execute(BlendingInfo<PixelType> *info) {
   width = GET_WIDTH(input);
   range = info->range;
 
-  // モード3に該当するのかチェック
+  // Check if mode 03 is applicable
   if (ComparePixelEqual(target, target - width + 1) &&
       ComparePixel(target, target + width)) {
     //-------------------------------
-    // モード03
+    // Mode 03
     //-------------------------------
 
     //-------------------------------
-    // 長さカウント
+    // Length count
     //-------------------------------
     // →
     for (i = info->i; i < input->width - 1; i++, target++) {
@@ -178,15 +178,15 @@ void LackMode0304Execute(BlendingInfo<PixelType> *info) {
       //          }
     }
   }
-  // モード04に該当するかチェック
+  // Check if mode 04 is applicable
   else if (ComparePixelEqual(target, target + width + 1) &&
            ComparePixel(target, target - width)) {
     //-------------------------------
-    // モード04
+    // Mode 04
     //-------------------------------
 
     //-------------------------------
-    // 長さカウント
+    // Length count
     //-------------------------------
     // →
     for (i = info->i; i < input->width - 1; i++, target++) {
@@ -232,7 +232,7 @@ void LackMode0304Execute(BlendingInfo<PixelType> *info) {
   }
 }
 
-// 明示的インスタンス化宣言
+// Explicit instantiation declarations
 template void LackMode01Execute<PF_Pixel8>(BlendingInfo<PF_Pixel8> *info);
 template void LackMode01Execute<PF_Pixel16>(BlendingInfo<PF_Pixel16> *info);
 
