@@ -1,34 +1,36 @@
 ﻿//----------------------------------------------------------------------------//
-// 概要: 上角系の処理
+// Processing of Upper-Angle Systems
 //----------------------------------------------------------------------------//
 
 #ifndef __UPMODE_H
 #define __UPMODE_H
 
-// 左側の長さカウント //
+// Length count on the left side
+//----------------------------------------------------------------------------//
 template <typename PixelType>
-void upMode_LeftCountLength(BlendingInfo<PixelType> *info); // 左
+void upMode_LeftCountLength(BlendingInfo<PixelType> *info); // Left
 
 template <typename PixelType>
-void upMode_RightCountLength(BlendingInfo<PixelType> *info); // 右
+void upMode_RightCountLength(BlendingInfo<PixelType> *info); // Right
 
 template <typename PixelType>
-void upMode_TopCountLength(BlendingInfo<PixelType> *info); // 上
+void upMode_TopCountLength(BlendingInfo<PixelType> *info); // Top
 
 template <typename PixelType>
-void upMode_BottomCountLength(BlendingInfo<PixelType> *info); // 下
+void upMode_BottomCountLength(BlendingInfo<PixelType> *info); // Bottom
 
-// ブレンド //
+// Blend
+//----------------------------------------------------------------------------//
 template <typename PixelType>
-void upMode_LeftBlending(BlendingInfo<PixelType> *info); // 左ブレンド
-
-template <typename PixelType>
-void upMode_RightBlending(BlendingInfo<PixelType> *info); // 右ブレンド
+void upMode_LeftBlending(BlendingInfo<PixelType> *info); // Left blend
 
 template <typename PixelType>
-void upMode_TopBlending(BlendingInfo<PixelType> *info); // 上ブレンド
+void upMode_RightBlending(BlendingInfo<PixelType> *info); // Right blend
 
 template <typename PixelType>
-void upMode_BottomBlending(BlendingInfo<PixelType> *info); // 下ブレンド
+void upMode_TopBlending(BlendingInfo<PixelType> *info); // Top blend
+
+template <typename PixelType>
+void upMode_BottomBlending(BlendingInfo<PixelType> *info); // Bottom blend
 
 #endif
