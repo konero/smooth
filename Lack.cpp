@@ -31,7 +31,7 @@ void LackMode01Execute(BlendingInfo<PixelType> *info) {
   }
 
   if ((3 >= h && h >= 2) && (3 >= v && v >= 2)) {
-    // ブレンド
+    // Blend
     PixelType ref0, ref1, ref2, ref_temp, src;
 
     src = in_ptr[info->in_target];
