@@ -1,12 +1,12 @@
 # SMOOTH
-アニメーションのスムージングを行うAfterEffects用のプラグインです。  
-もともと有償で販売していたものをオープンソース化しました。
+This is a plugin for AfterEffects that performs animation smoothing.
+Originally a paid product, it has been open-sourced.
 
-AfterEffects CC2017で使えるように、最新のビルド環境に対応させています。  
-ライセンスはApache2.0です。派生品の開発やインハウスでのカスタマイズなどご自由にご利用ください。  
+It is compatible with the latest build environment to be used with AfterEffects CC2017.
+The license is Apache2.0. Feel free to use it for derivative development or in-house customization. 
 
-## ダウンロード
-バイナリーはこちらからダウンロードできます。
+## Download
+You can download the binary from here.
 
 Mac  
 http://assets.loilo.tv/smooth/smooth.Mac.1.4.0.zip
@@ -15,14 +15,14 @@ Windows
 http://assets.loilo.tv/smooth/smooth.Win.1.4.0.zip
 
 
-## ライセンス
+## License
 Apache2.0
 
-## ビルド方法
+## Build Method
 ### Win
 Windows10 64bit / VisualStudio2017  
-AfterEffects CC2017 SDKをダウロードしてsmoothと同じ階層のディレクトリに置いてください。
+Please download the AfterEffects CC2017 SDK and place it in the same directory as smooth.
 
 ### Mac
 MacOSX Sierra / XCode9.0  
-AfterEffects CC2017 SDKをダウロードして、sdkとリネーム後、smoothと同じ階層のディレクトリに置いてください。
+Please download the AfterEffects CC2017 SDK, rename it to sdk, and place it in the same directory as smooth.
